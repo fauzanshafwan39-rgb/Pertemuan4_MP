@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'detail_materi_page.dart'; 
-// Tambahkan import ke file pertemuan6 yang baru kamu buat di dalam folder pertemuan
+// Import file pertemuan yang sudah kamu buat
 import 'package:tugaspert4_mp/pertemuan/pertemuan6.dart';
+import 'package:tugaspert4_mp/pertemuan/pertemuan7.dart';
+
 class ListPertemuanPage extends StatelessWidget {
   const ListPertemuanPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Data list materi tetap sama tanpa perubahan
+    // Data list materi
     final List<Map<String, String>> materi = [
       {"judul": "Pertemuan 1", "sub": "Pengenalan Android", "desc": "Mempelajari dasar-dasar Android Studio dan arsitektur mobile apps."},
       {"judul": "Pertemuan 2", "sub": "Widget & Button", "desc": "Eksperimen dengan berbagai widget UI seperti Row, Column, dan Button."},
@@ -50,8 +52,9 @@ class ListPertemuanPage extends StatelessWidget {
               subtitle: Text(materi[index]['sub']!),
               trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
               onTap: () {
-                // LOGIKA NAVIGASI:
-                // Jika judulnya "Pertemuan 6", arahkan ke halaman tugas coding CheckboxPage
+                // LOGIKA NAVIGASI YANG DIPERBAIKI:
+                
+                // 1. Jika klik Pertemuan 6
                 if (materi[index]['judul'] == "Pertemuan 6") {
                   Navigator.push(
                     context,
@@ -60,7 +63,16 @@ class ListPertemuanPage extends StatelessWidget {
                     ),
                   );
                 } 
-                // Jika bukan Pertemuan 6, arahkan ke detail deskripsi seperti biasa
+                // 2. Jika klik Pertemuan 7 (DITAMBAHKAN)
+                else if (materi[index]['judul'] == "Pertemuan 7") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RadiobuttonPage(),
+                    ),
+                  );
+                } 
+                // 3. Jika klik selain pertemuan 6 & 7 (1 sampai 5)
                 else {
                   Navigator.push(
                     context,
