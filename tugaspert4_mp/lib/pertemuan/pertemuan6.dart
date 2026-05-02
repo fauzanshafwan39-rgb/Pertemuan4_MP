@@ -1,46 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class RadiobuttonPage extends StatefulWidget {
-  const RadiobuttonPage({super.key});
+class CheckboxPage extends StatefulWidget {
+  const CheckboxPage({super.key});
 
   @override
-  _RadiobuttonPageState createState() => _RadiobuttonPageState();
+  _CheckboxPageState createState() => _CheckboxPageState();
 }
 
-class _RadiobuttonPageState extends State<RadiobuttonPage> {
+class _CheckboxPageState extends State<CheckboxPage> {
   final _formKey = GlobalKey<FormState>();
   final _namaController = TextEditingController();
-  final _umurController = TextEditingController();
+  final _nimController = TextEditingController();
+  final _kelasController = TextEditingController();
+  
+  bool _isCheckedSyarat = false;
 
-  String? _selectedGender;
-  String? _selectedJob;
-  String? _selectedWorkType;
-
-  // Palette Warna Modern
+  // Palette Warna Modern (Indigo & Lavender)
   final Color primaryColor = const Color(0xFF6366F1); 
   final Color accentColor = const Color(0xFF818CF8);
 
-  final List<Map<String, dynamic>> _jobOptions = [
-    {'value': 'Admin', 'icon': Icons.support_agent, 'color': Color(0xFF3B82F6)},
-    {'value': 'Guru', 'icon': Icons.school, 'color': Color(0xFF10B981)},
-    {'value': 'Programmer', 'icon': Icons.code, 'color': Color(0xFF6366F1)},
-    {'value': 'Pengusaha', 'icon': Icons.business, 'color': Color(0xFFF59E0B)},
-    {'value': 'Desainer', 'icon': Icons.design_services, 'color': Color(0xFFEC4899)},
-  ];
-
-  final List<Map<String, dynamic>> _workTypeOptions = [
-    {'value': 'Full Time', 'desc': 'Prioritas Utama', 'icon': Icons.timer},
-    {'value': 'Part Time', 'desc': 'Fleksibel', 'icon': Icons.shutter_speed},
-    {'value': 'Freelance', 'desc': 'Remote-ready', 'icon': Icons.laptop_mac},
-  ];
+  // Data Hobi (Checkbox)
+  final Map<String, bool> _hobbies = {
+    'Membaca': false,
+    'Olahraga': false,
+    'Musik': false,
+    'Game': false,
+    'Traveling': false,
+    'Coding': false,
+  };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: const Text("Career Profile", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text("Student Registration", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         backgroundColor: primaryColor,
         centerTitle: true,
         elevation: 0,
@@ -52,33 +47,50 @@ class _RadiobuttonPageState extends State<RadiobuttonPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionHeader("Informasi Pribadi", Icons.person_outline),
+              _buildSectionHeader("Data Mahasiswa", Icons.school_outlined),
               _buildCard([
-                _buildTextField(_namaController, "Nama Lengkap", Icons.person),
+                _buildTextField(_namaController, "Nama Lengkap", Icons.person_outline),
                 const SizedBox(height: 16),
-                _buildTextField(_umurController, "Umur", Icons.cake, isNumber: true),
+                _buildTextField(_nimController, "NIM", Icons.badge_outlined, isNumber: true),
+                const SizedBox(height: 16),
+                _buildTextField(_kelasController, "Kelas", Icons.class_outlined),
               ]),
 
               const SizedBox(height: 24),
-              _buildSectionHeader("Profesi", Icons.work_outline),
-              _buildJobGrid(),
+              _buildSectionHeader("Minat & Hobi", Icons.favorite_border),
+              _buildHobbyGrid(),
 
               const SizedBox(height: 24),
-              _buildSectionHeader("Tipe Pekerjaan", Icons.bolt_outlined),
-              _buildWorkTypeSelector(),
+              // Checkbox Syarat & Ketentuan
+              CheckboxListTile(
+                title: const Text("Saya menyetujui syarat dan ketentuan", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                value: _isCheckedSyarat,
+                activeColor: primaryColor,
+                onChanged: (v) => setState(() => _isCheckedSyarat = v!),
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding: EdgeInsets.zero,
+              ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 32),
               // Tombol Daftar
-              SizedBox(
+              Container(
                 width: double.infinity,
                 height: 55,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(colors: [primaryColor, accentColor]),
+                  boxShadow: [
+                    BoxShadow(color: primaryColor.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8)),
+                  ],
+                ),
                 child: ElevatedButton(
                   onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: const Text("SIMPAN DATA", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                  child: const Text("DAFTAR SEKARANG", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
             ],
@@ -109,7 +121,8 @@ class _RadiobuttonPageState extends State<RadiobuttonPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+        border: Border.all(color: Colors.grey.shade100),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10)],
       ),
       child: Column(children: children),
     );
@@ -130,78 +143,61 @@ class _RadiobuttonPageState extends State<RadiobuttonPage> {
     );
   }
 
-  Widget _buildJobGrid() {
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: _jobOptions.map((job) {
-        bool isSelected = _selectedJob == job['value'];
-        return GestureDetector(
-          onTap: () => setState(() => _selectedJob = job['value']),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: isSelected ? job['color'] : Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: isSelected ? job['color'] : Colors.grey.shade300),
+  Widget _buildHobbyGrid() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: _hobbies.keys.map((hobby) {
+          bool isSelected = _hobbies[hobby]!;
+          return FilterChip(
+            label: Text(hobby),
+            selected: isSelected,
+            onSelected: (bool selected) {
+              setState(() {
+                _hobbies[hobby] = selected;
+              });
+            },
+            selectedColor: primaryColor.withOpacity(0.2),
+            checkmarkColor: primaryColor,
+            labelStyle: TextStyle(
+              color: isSelected ? primaryColor : Colors.black87,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(job['icon'], size: 18, color: isSelected ? Colors.white : job['color']),
-                const SizedBox(width: 8),
-                Text(job['value'], style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontWeight: FontWeight.bold)),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
+            backgroundColor: Colors.grey.shade100,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          );
+        }).toList(),
+      ),
     );
   }
 
-  Widget _buildWorkTypeSelector() {
-    return Column(
-      children: _workTypeOptions.map((type) {
-        bool isSelected = _selectedWorkType == type['value'];
-        return GestureDetector(
-          onTap: () => setState(() => _selectedWorkType = type['value']),
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: isSelected ? primaryColor.withOpacity(0.05) : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: isSelected ? primaryColor : Colors.grey.shade200),
-            ),
-            child: Row(
-              children: [
-                Icon(type['icon'], color: isSelected ? primaryColor : Colors.grey),
-                const SizedBox(width: 12),
-                Expanded(child: Text(type['value'], style: const TextStyle(fontWeight: FontWeight.bold))),
-                Radio<String>(
-                  value: type['value'],
-                  groupValue: _selectedWorkType,
-                  activeColor: primaryColor,
-                  onChanged: (v) => setState(() => _selectedWorkType = v),
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  // --- LOGIC SIMPAN & TAMPILAN MODAL (SESUAI GAMBAR) ---
+  // --- LOGIC SIMPAN & MODAL (ESTETIK) ---
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      if (_selectedJob == null || _selectedWorkType == null) {
-        Fluttertoast.showToast(msg: "Lengkapi semua pilihan!", gravity: ToastGravity.CENTER);
+      // Validasi: Minimal 1 hobi dipilih
+      if (!_hobbies.values.any((element) => element)) {
+        Fluttertoast.showToast(msg: "Pilih minimal satu hobi!", gravity: ToastGravity.CENTER);
+        return;
+      }
+      
+      // Validasi: Syarat & Ketentuan
+      if (!_isCheckedSyarat) {
+        Fluttertoast.showToast(msg: "Setujui syarat & ketentuan!", gravity: ToastGravity.CENTER);
         return;
       }
 
-      // MODAL BOTTOM SHEET SESUAI GAMBAR USER
+      List<String> selectedHobbies = _hobbies.entries
+          .where((e) => e.value)
+          .map((e) => e.key)
+          .toList();
+
       showModalBottomSheet(
         context: context,
         backgroundColor: Colors.transparent,
@@ -214,31 +210,23 @@ class _RadiobuttonPageState extends State<RadiobuttonPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Garis handle atas
               Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10))),
               const SizedBox(height: 24),
-              
-              // Icon Check Hijau
               const CircleAvatar(
                 radius: 35,
                 backgroundColor: Color(0xFF4CAF50),
                 child: Icon(Icons.check, color: Colors.white, size: 45),
               ),
               const SizedBox(height: 20),
-              
-              // Teks Berhasil
-              const Text("Data Berhasil Disimpan", 
+              const Text("Pendaftaran Berhasil", 
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87)),
               const SizedBox(height: 30),
               
-              // Ringkasan Data (Row Align Left & Right)
               _buildSummaryRow("Nama", _namaController.text),
-              _buildSummaryRow("Profesi", _selectedJob!),
-              _buildSummaryRow("Tipe", _selectedWorkType!),
+              _buildSummaryRow("NIM", _nimController.text),
+              _buildSummaryRow("Hobi", selectedHobbies.join(", ")),
               
               const SizedBox(height: 40),
-              
-              // Tombol Selesai
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text("Selesai", style: TextStyle(fontSize: 18, color: primaryColor, fontWeight: FontWeight.bold)),
@@ -257,8 +245,13 @@ class _RadiobuttonPageState extends State<RadiobuttonPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 16)),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black)),
+          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 15)),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Text(value, 
+              textAlign: TextAlign.right,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+          ),
         ],
       ),
     );

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'detail_materi_page.dart'; 
-// Import file pertemuan yang sudah kamu buat
+
+// 1. Perbaikan: Hapus 'hide RadiobuttonPage' agar class bisa terbaca
 import 'package:tugaspert4_mp/pertemuan/pertemuan6.dart';
-import 'package:tugaspert4_mp/pertemuan/pertemuan7.dart';
+import 'package:tugaspert4_mp/pertemuan/pertemuan7.dart'; 
 
 class ListPertemuanPage extends StatelessWidget {
   const ListPertemuanPage({super.key});
@@ -23,7 +24,10 @@ class ListPertemuanPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFF),
       appBar: AppBar(
-        title: const Text("Daftar Materi", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text(
+          "Daftar Materi", 
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)
+        ),
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
         elevation: 0,
@@ -38,38 +42,44 @@ class ListPertemuanPage extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05), 
+                  blurRadius: 10, 
+                  offset: const Offset(0, 4)
+                ),
               ],
             ),
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               leading: Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: Colors.blueAccent.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(
+                  color: Colors.blueAccent.withOpacity(0.1), 
+                  borderRadius: BorderRadius.circular(12)
+                ),
                 child: const Icon(Icons.book_outlined, color: Colors.blueAccent),
               ),
-              title: Text(materi[index]['judul']!, style: const TextStyle(fontWeight: FontWeight.bold)),
+              title: Text(
+                materi[index]['judul']!, 
+                style: const TextStyle(fontWeight: FontWeight.bold)
+              ),
               subtitle: Text(materi[index]['sub']!),
               trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
               onTap: () {
-                // LOGIKA NAVIGASI YANG DIPERBAIKI:
+                // LOGIKA NAVIGASI
                 
                 // 1. Jika klik Pertemuan 6
                 if (materi[index]['judul'] == "Pertemuan 6") {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const CheckboxPage(),
-                    ),
+                    MaterialPageRoute(builder: (context) => const CheckboxPage()),
                   );
                 } 
-                // 2. Jika klik Pertemuan 7 (DITAMBAHKAN)
+                // 2. Jika klik Pertemuan 7
                 else if (materi[index]['judul'] == "Pertemuan 7") {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const RadiobuttonPage(),
-                    ),
+                    MaterialPageRoute(builder: (context) => const RadiobuttonPage()),
                   );
                 } 
                 // 3. Jika klik selain pertemuan 6 & 7 (1 sampai 5)
