@@ -4,6 +4,7 @@ import 'detail_materi_page.dart';
 // 1. Perbaikan: Hapus 'hide RadiobuttonPage' agar class bisa terbaca
 import 'package:tugaspert4_mp/pertemuan/pertemuan6.dart';
 import 'package:tugaspert4_mp/pertemuan/pertemuan7.dart'; 
+import 'package:tugaspert4_mp/pertemuan/pertemuan8.dart'; // Import Pertemuan 8
 
 class ListPertemuanPage extends StatelessWidget {
   const ListPertemuanPage({super.key});
@@ -19,6 +20,7 @@ class ListPertemuanPage extends StatelessWidget {
       {"judul": "Pertemuan 5", "sub": "ListView", "desc": "Menampilkan data dinamis dalam bentuk daftar yang bisa di-scroll."},
       {"judul": "Pertemuan 6", "sub": "Checkbox", "desc": "Mengelola input pilihan ganda untuk form aplikasi."},
       {"judul": "Pertemuan 7", "sub": "Radio Button", "desc": "Implementasi pilihan tunggal menggunakan widget Radio."},
+      {"judul": "Pertemuan 8", "sub": "Autocomplete & Spinner", "desc": "Implementasi input teks otomatis dan dropdown menu."}, // Tambahan Pertemuan 8
     ];
 
     return Scaffold(
@@ -82,7 +84,14 @@ class ListPertemuanPage extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => const RadiobuttonPage()),
                   );
                 } 
-                // 3. Jika klik selain pertemuan 6 & 7 (1 sampai 5)
+                // 3. Jika klik Pertemuan 8 (BARU)
+                else if (materi[index]['judul'] == "Pertemuan 8") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Pertemuan8Page()),
+                  );
+                }
+                // 4. Jika klik selain pertemuan 6, 7 & 8 (1 sampai 5)
                 else {
                   Navigator.push(
                     context,

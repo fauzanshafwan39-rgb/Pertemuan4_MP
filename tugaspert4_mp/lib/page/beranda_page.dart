@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:cherry_toast/cherry_toast.dart';
-import 'package:simple_alert_dialog/simple_alert_dialog.dart';
+import 'detail_materi_page.dart'; 
+import 'package:tugaspert4_mp/pertemuan/pertemuan6.dart';
+import 'package:tugaspert4_mp/pertemuan/pertemuan7.dart'; 
+import 'package:tugaspert4_mp/pertemuan/pertemuan8.dart';
 
 class BerandaPage extends StatefulWidget {
   final Function(Map<String, String>) onSave;
@@ -23,185 +25,246 @@ class BerandaPage extends StatefulWidget {
 }
 
 class _BerandaPageState extends State<BerandaPage> {
-  // Controller dipisah agar tidak duplikat saat build ulang
-  final Map<String, TextEditingController> _controllers = {
-    'nama': TextEditingController(),
-    'lokasi': TextEditingController(),
-    'jabatan': TextEditingController(),
-    'profesi': TextEditingController(),
-    'email': TextEditingController(),
-    'hp': TextEditingController(),
-    'tentang': TextEditingController(),
-    'interests': TextEditingController(), // TAMBAHKAN CONTROLLER INTERESTS
-  };
+  String? _selectedCategory;
+  final List<String> _categories = ['Semua', 'Teori', 'Praktikum', 'Tugas'];
+  String _searchQuery = "";
 
-  @override
-  void initState() {
-    super.initState();
-    _fillData();
-  }
-
-  void _fillData() {
-    widget.userData.forEach((key, value) {
-      if (_controllers.containsKey(key)) {
-        _controllers[key]!.text = value;
-      }
-    });
-  }
-
-  @override
-  void didUpdateWidget(covariant BerandaPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Jika data dihapus dari main.dart, kosongkan form
-    if (widget.userData.isEmpty && oldWidget.userData.isNotEmpty) {
-      _controllers.forEach((key, value) => value.clear());
-    }
-  }
+  // DATA MATERI UTAMA (Sesuai dengan data awal, tidak ada yang diubah tulisannya)
+  final List<Map<String, dynamic>> materi = [
+    {
+      "judul": "Pertemuan 1", 
+      "sub": "Pengenalan Android", 
+      "desc": "Mempelajari dasar-dasar Android Studio dan arsitektur mobile apps.",
+      "color": Colors.pinkAccent
+    },
+    {
+      "judul": "Pertemuan 2", 
+      "sub": "Widget & Button", 
+      "desc": "Eksperimen dengan berbagai widget UI seperti Row, Column, dan Button.",
+      "color": Colors.orangeAccent
+    },
+    {
+      "judul": "Pertemuan 3", 
+      "sub": "Activity & Intent", 
+      "desc": "Belajar cara berpindah halaman dan membawa data antar screen.",
+      "color": Colors.purpleAccent
+    },
+    {
+      "judul": "Pertemuan 4", 
+      "sub": "Toast & AlertDialog", 
+      "desc": "Implementasi notifikasi popup dan dialog konfirmasi user.",
+      "color": Colors.greenAccent
+    },
+    {
+      "judul": "Pertemuan 5", 
+      "sub": "ListView", 
+      "desc": "Menampilkan data dinamis dalam bentuk daftar yang bisa di-scroll.",
+      "color": Colors.blueAccent
+    },
+    {
+      "judul": "Pertemuan 6", 
+      "sub": "Checkbox", 
+      "desc": "Mengelola input pilihan ganda untuk form aplikasi.",
+      "color": Colors.tealAccent
+    },
+    {
+      "judul": "Pertemuan 7", 
+      "sub": "Radio Button", 
+      "desc": "Implementasi pilihan tunggal menggunakan widget Radio.",
+      "color": Colors.amberAccent
+    },
+    {
+      "judul": "Pertemuan 8", 
+      "sub": "Autocomplete & Spinner", 
+      "desc": "Implementasi input teks otomatis dan dropdown menu.",
+      "color": Colors.redAccent
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
+    // Logika Filter Pencarian
+    List<Map<String, dynamic>> filteredMateri = materi.where((item) {
+      return item['judul']!.toLowerCase().contains(_searchQuery.toLowerCase());
+    }).toList();
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFF),
-      appBar: AppBar(
-        backgroundColor: Colors.blueAccent,
-        title: const Text("Beranda", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            _buildActionButtons(),
-            const SizedBox(height: 25),
-            if (widget.showForm) _buildSmoothForm(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionButtons() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(25),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15)],
-      ),
-      child: Column(
-        children: [
-          _customButton("Buka Form Input", Colors.green, Icons.edit_note, () {
-            widget.onToggleForm(true);
-            CherryToast.info(title: const Text("Form telah siap")).show(context);
-          }),
-          const SizedBox(height: 12),
-          _customButton("Hapus Data", Colors.redAccent, Icons.delete_sweep, () {
-            SimpleAlertDialog.show(
-              context,
-              assetImagepath: AnimatedImage.warning,
-              buttonsColor: Colors.redAccent,
-              title: AlertTitleText("Hapus?"),
-              content: AlertContentText("Semua data profil akan direset."),
-              onConfirmButtonPressed: (ctx) {
-                widget.onDelete();
-                Navigator.pop(ctx);
-              },
-            );
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSmoothForm() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: Colors.blueAccent.withOpacity(0.1)),
-      ),
-      child: Column(
-        children: [
-          const Text("Informasi Profil", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 20),
-          _inputField(_controllers['nama']!, "Nama Lengkap", Icons.person_outline),
-          _inputField(_controllers['lokasi']!, "Lokasi", Icons.map_outlined),
-          _inputField(_controllers['jabatan']!, "Jabatan", Icons.work_outline),
-          _inputField(_controllers['profesi']!, "Profesi", Icons.psychology_outlined),
-          _inputField(_controllers['email']!, "Email", Icons.email_outlined),
-          _inputField(_controllers['hp']!, "Nomor HP", Icons.phone_android_outlined),
-          
-          // INPUT BARU: SKILLS & INTERESTS
-          _inputField(_controllers['interests']!, "Skills & Interests (Pisah dengan koma)", Icons.star_border_rounded),
-          
-          _inputField(_controllers['tentang']!, "Tentang Saya", Icons.info_outline, maxLines: 3),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
-              minimumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      backgroundColor: const Color(0xFFF8F9FD),
+      body: CustomScrollView(
+        slivers: [
+          // HEADER
+          SliverAppBar(
+            expandedHeight: 110.0,
+            pinned: true,
+            elevation: 0,
+            backgroundColor: const Color(0xFF1976D2),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF64B5F6), Color(0xFF1976D2)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 55, left: 25),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Halo, ${widget.userData['nama'] ?? 'Pelajar'} 👋",
+                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const Text("Ayo lanjutkan belajarmu!", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    ],
+                  ),
+                ),
+              ),
             ),
-            onPressed: () {
-              widget.onSave({
-                'nama': _controllers['nama']!.text,
-                'lokasi': _controllers['lokasi']!.text,
-                'jabatan': _controllers['jabatan']!.text,
-                'profesi': _controllers['profesi']!.text,
-                'email': _controllers['email']!.text,
-                'hp': _controllers['hp']!.text,
-                'interests': _controllers['interests']!.text, // DATA IKUT DISIMPAN
-                'tentang': _controllers['tentang']!.text,
-              });
-              CherryToast.success(title: const Text("Data tersimpan!")).show(context);
-            },
-            child: const Text("Simpan Data", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+
+          // SEARCH BOX & SPINNER
+          SliverToBoxAdapter(
+            child: Transform.translate(
+              offset: const Offset(0, -25),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(22),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 8))
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Autocomplete<String>(
+                        optionsBuilder: (textVal) => textVal.text == '' 
+                          ? const Iterable<String>.empty() 
+                          : materi.map((e) => e['judul'] as String).where((j) => j.toLowerCase().contains(textVal.text.toLowerCase())),
+                        onSelected: (val) => setState(() => _searchQuery = val),
+                        fieldViewBuilder: (ctx, ctrl, node, onSub) {
+                          return TextField(
+                            controller: ctrl,
+                            focusNode: node,
+                            onChanged: (v) => setState(() => _searchQuery = v),
+                            style: const TextStyle(fontSize: 13),
+                            decoration: InputDecoration(
+                              hintText: 'Cari modul kuliah...',
+                              prefixIcon: const Icon(Icons.search_rounded, size: 20, color: Colors.blueAccent),
+                              filled: true,
+                              fillColor: const Color(0xFFF0F5FF),
+                              contentPadding: EdgeInsets.zero,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        height: 38,
+                        child: DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: const Color(0xFFF0F5FF),
+                            prefixIcon: const Icon(Icons.category_rounded, size: 18, color: Colors.blueAccent),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                          ),
+                          hint: const Text("Tipe Materi", style: TextStyle(fontSize: 12)),
+                          items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c, style: const TextStyle(fontSize: 12)))).toList(),
+                          onChanged: (v) => setState(() => _selectedCategory = v),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // GRID MODUL (BUBBLE STYLE)
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            sliver: SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 15,
+                mainAxisSpacing: 15,
+                childAspectRatio: 0.85, 
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final item = filteredMateri[index];
+                  return GestureDetector(
+                    onTap: () => _handleNavigation(context, item),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(28),
+                        boxShadow: [
+                          BoxShadow(color: (item['color'] as Color).withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 4))
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              color: (item['color'] as Color).withOpacity(0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.auto_stories_rounded, size: 28, color: item['color']),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            item['judul']!,
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                          ),
+                          const SizedBox(height: 4),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Text(
+                              item['sub']!,
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 11, color: Colors.grey),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                childCount: filteredMateri.length,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _inputField(TextEditingController controller, String label, IconData icon, {int maxLines = 1}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: TextField(
-        controller: controller,
-        maxLines: maxLines,
-        decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: Colors.blueAccent),
-          labelText: label,
-          filled: true,
-          fillColor: const Color(0xFFF0F4FF),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+  void _handleNavigation(BuildContext context, Map<String, dynamic> item) {
+    if (item['judul'] == "Pertemuan 6") {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckboxPage()));
+    } else if (item['judul'] == "Pertemuan 7") {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const RadiobuttonPage()));
+    } else if (item['judul'] == "Pertemuan 8") {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const Pertemuan8Page()));
+    } else {
+      Navigator.push(context, MaterialPageRoute(
+        builder: (context) => DetailMateriPage(
+          judul: item['judul']!, 
+          sub: item['sub']!, 
+          deskripsi: item['desc']!,
         ),
-      ),
-    );
-  }
-
-  Widget _customButton(String text, Color color, IconData icon, VoidCallback tap) {
-    return InkWell(
-      onTap: tap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(15)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white),
-            const SizedBox(width: 10),
-            Text(text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controllers.forEach((key, value) => value.dispose());
-    super.dispose();
+      ));
+    }
   }
 }

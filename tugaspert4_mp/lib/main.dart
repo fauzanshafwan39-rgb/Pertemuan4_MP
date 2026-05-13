@@ -1,9 +1,8 @@
-import 'dart:convert'; // Untuk encode/decode Map ke String
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tugaspert4_mp/page/beranda_page.dart';
 import 'package:tugaspert4_mp/page/profile_page.dart';
-import 'package:tugaspert4_mp/page/list_pertemuan_page.dart'; // IMPORT HALAMAN BARU
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 void main() => runApp(const MyApp());
@@ -27,41 +26,50 @@ class _MyAppState extends State<MyApp> {
     _loadSavedData();
   }
 
+  // Mengambil data yang tersimpan di memori perangkat
   Future<void> _loadSavedData() async {
     final prefs = await SharedPreferences.getInstance();
     final String? savedUser = prefs.getString('user_profile');
     if (savedUser != null) {
+      if (mounted) {
+        setState(() {
+          userData = Map<String, String>.from(json.decode(savedUser));
+          isDataSaved = true;
+          showForm = true;
+        });
+      }
+    }
+  }
+
+  // Fungsi untuk menyimpan data profil
+  Future<void> handleSave(Map<String, String> data) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_profile', json.encode(data));
+    if (mounted) {
       setState(() {
-        userData = Map<String, String>.from(json.decode(savedUser));
+        userData = data;
         isDataSaved = true;
-        showForm = true;
       });
     }
   }
 
-  Future<void> handleSave(Map<String, String> data) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      userData = data;
-      isDataSaved = true;
-    });
-    await prefs.setString('user_profile', json.encode(data));
-  }
-
+  // Fungsi untuk menghapus data profil
   Future<void> handleDelete() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      userData = {};
-      isDataSaved = false;
-      showForm = false;
-    });
     await prefs.remove('user_profile');
+    if (mounted) {
+      setState(() {
+        userData = {};
+        isDataSaved = false;
+        showForm = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // TAMBAHKAN HALAMAN LIST KE DALAM ARRAY PAGES
-    List<Widget> pages = [
+    // Definisi halaman yang akan ditampilkan
+    final List<Widget> pages = [
       BerandaPage(
         onSave: handleSave,
         onDelete: handleDelete,
@@ -70,7 +78,6 @@ class _MyAppState extends State<MyApp> {
         userData: userData,
       ),
       ProfilePage(userData: userData, isDataSaved: isDataSaved),
-      const ListPertemuanPage(), // <--- HALAMAN LIST BARU DI SINI
     ];
 
     return MaterialApp(
@@ -80,28 +87,40 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
       ),
       home: Scaffold(
-        body: pages[currentPage],
-        bottomNavigationBar: SalomonBottomBar(
-          currentIndex: currentPage,
-          onTap: (i) => setState(() => currentPage = i),
-          items: [
-            SalomonBottomBarItem(
-              icon: const Icon(Icons.home_rounded),
-              title: const Text("Beranda"),
-              selectedColor: Colors.blueAccent,
+        // IndexedStack menjaga agar scroll position di Beranda tidak hilang
+        body: IndexedStack(
+          index: currentPage,
+          children: pages,
+        ),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+              )
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: SalomonBottomBar(
+              currentIndex: currentPage,
+              onTap: (i) => setState(() => currentPage = i),
+              items: [
+                SalomonBottomBarItem(
+                  icon: const Icon(Icons.home_rounded),
+                  title: const Text("Beranda"),
+                  selectedColor: Colors.blueAccent,
+                ),
+                SalomonBottomBarItem(
+                  icon: const Icon(Icons.person_rounded),
+                  title: const Text("Profil"),
+                  selectedColor: Colors.blueAccent,
+                ),
+              ],
             ),
-            SalomonBottomBarItem(
-              icon: const Icon(Icons.person_rounded),
-              title: const Text("Profil"),
-              selectedColor: Colors.blueAccent,
-            ),
-            // TAMBAHKAN ITEM BARU DI BOTTOM BAR
-            SalomonBottomBarItem(
-              icon: const Icon(Icons.list_alt_rounded),
-              title: const Text("List"),
-              selectedColor: Colors.blueAccent,
-            ),
-          ],
+          ),
         ),
       ),
     );
