@@ -3,6 +3,7 @@ import 'detail_materi_page.dart';
 import 'package:tugaspert4_mp/pertemuan/pertemuan6.dart';
 import 'package:tugaspert4_mp/pertemuan/pertemuan7.dart'; 
 import 'package:tugaspert4_mp/pertemuan/pertemuan8.dart';
+import 'package:tugaspert4_mp/pertemuan/pertemuan9.dart'; // Import Pertemuan 9 baru
 
 class BerandaPage extends StatefulWidget {
   final Function(Map<String, String>) onSave;
@@ -29,7 +30,7 @@ class _BerandaPageState extends State<BerandaPage> {
   final List<String> _categories = ['Semua', 'Teori', 'Praktikum', 'Tugas'];
   String _searchQuery = "";
 
-  // DATA MATERI UTAMA (Sesuai dengan data awal, tidak ada yang diubah tulisannya)
+  // DATA MATERI UTAMA (Teks asli dipertahankan, ditambah Pertemuan 9)
   final List<Map<String, dynamic>> materi = [
     {
       "judul": "Pertemuan 1", 
@@ -78,6 +79,12 @@ class _BerandaPageState extends State<BerandaPage> {
       "sub": "Autocomplete & Spinner", 
       "desc": "Implementasi input teks otomatis dan dropdown menu.",
       "color": Colors.redAccent
+    },
+    {
+      "judul": "Pertemuan 9", 
+      "sub": "Date & Time Picker", 
+      "desc": "Implementasi pemilihan komponen penanggalan dan waktu sistem.",
+      "color": Colors.indigoAccent
     },
   ];
 
@@ -257,6 +264,8 @@ class _BerandaPageState extends State<BerandaPage> {
       Navigator.push(context, MaterialPageRoute(builder: (context) => const RadiobuttonPage()));
     } else if (item['judul'] == "Pertemuan 8") {
       Navigator.push(context, MaterialPageRoute(builder: (context) => const Pertemuan8Page()));
+    } else if (item['judul'] == "Pertemuan 9") { // Navigasi baru untuk Pertemuan 9
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const Pertemuan9Page()));
     } else {
       Navigator.push(context, MaterialPageRoute(
         builder: (context) => DetailMateriPage(
